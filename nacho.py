@@ -52,20 +52,21 @@ def calcula_b(N, f, g):
     g_h = np.zeros(N**2)
     x = np.linspace(0,1,N)
     y = np.linspace(0,1,N)
+    h = 1 / (N - 1)
 
     for j in range(len(x)):
         for k in range(len(y)):    
-            f_h[(k-1)*(N-1)+j] = f(x[j], y[k])
+            f_h[(k)*(N-1)+j] = f(x[j], y[k])
 
-    g_h[1] = N**2*(g(x[1],0) + g(0,y[1]))
-    g_h[N-1] = N**2*(g(x[N-1],0) + g(1,y[1]))
-    g_h[(N-1)**2 - (N-2)]=N**2*(g(x[1],1) + g(0,y[N-1]))
-    g_h[(N-1)**2] = N**2*(g(x[N-1],1) + g(1,y[N-1]))
-    for j in range(2,N-1):#esto es para j in {2,...,N-2}
-        g_h[j] = N**2*g(x[j],0)
-        g_h[(N-1)*(N-2) + j] = N**2*g(x[j],1)
-        g_h[j*(N-1) + 1] = N**2*(g(0,y[j]))
-        g_h[j*(N-1)] = N**2*g(1,y[j])
+    # g_h[1] = (1/h)**2*(g(x[1],0) + g(0,y[1]))
+    # g_h[N-2] = (1/h)**2*(g(x[N-2],0) + g(1,y[1]))
+    # g_h[(N-2)**2 - (N-3)] = (1/h)**2*(g(x[1],1) + g(0,y[N-1]))
+    # g_h[(N-2)**2] = (1/h)**2*(g(x[N-2],1) + g(1,y[N-2]))
+    # for j in range(2,N-2):#esto es para j in {2,...,N-2}
+    #     g_h[j] = (1/h)**2*g(x[j],0)
+    #     g_h[(N-2)*(N-3) + j] = (1/h)**2*g(x[j],1)
+    #     g_h[j*(N-2) + 1] = (1/h)**2*(g(0,y[j]))
+    #     g_h[j*(N-2)] = (1/h)**2*g(1,y[j])
 
     b_h = f_h + g_h
     return b_h
@@ -77,12 +78,12 @@ def calcula_b(N, f, g):
 N = [4, 16]
 
 for i in range(2):
-    u = sp.sparse.linalg.spsolve(calcula_A(N[i]), calcula_b(N[i]-1, f, g))
+    u = sp.sparse.linalg.spsolve(calcula_A(N[i]), calcula_b(N[i], f, g))
     U = np.zeros((N[i], N[i]))
     counter = 0
-    for j in range(N[i]-1):
-        for k in range(N[i]-1):
-            U[k][j] = u[k + j*(N[i]-1)]
+    for j in range(N[i]):
+        for k in range(N[i]):
+            U[k][j] = u[k + j*(N[i])]
 
     x = np.linspace(0,1, N[i])
 
