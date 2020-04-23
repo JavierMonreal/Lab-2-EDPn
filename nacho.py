@@ -123,7 +123,7 @@ for i in range(len(arreglo_N)):
 
     for j in range(N):
         for k in range(N):    
-            U_analitico[(k-1)*(N-1)+j] = u_analitico(x[j], y[k])
+            U_analitico[j][k] = u_analitico(x[j], y[k])
     
     err = h * np.linalg.norm(U_analitico - U, 2)
     errores_norm_2.append(err)
