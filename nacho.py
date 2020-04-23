@@ -10,8 +10,9 @@ from scipy import linalg, optimize
 # Escriba dos funciones que calculen A_h y b_h. La entrada debe ser N,f,g
 
 
-def calcula_A(N):
-    h = 1/ (N-1)
+def calcula_A(n):
+    N = n+1
+    h = 1/N
     down = np.ones(N-2)
     center = np.ones(N-1)
     upper = np.ones(N-2)
@@ -48,28 +49,28 @@ f = lambda x,y: 8*np.pi**2*np.sin(2*np.pi*x)*np.sin(2*np.pi*y)
 
 
 def calcula_b(N, f, g):
-    f_h = np.zeros(N**2)
-    g_h = np.zeros(N**2)
-    x = np.linspace(0,1,N)
-    y = np.linspace(0,1,N)
-    h = 1 / (N - 1)
+    f_h = np.zeros((N+1)**2)
+    g_h = np.zeros((N+1)**2)
+    x = np.linspace(0,1,N+1)
+    y = np.linspace(0,1,N+1)
+    h = 1 / N
 
     for j in range(len(x)):
-        for k in range(len(y)):    
-            f_h[(k)*(N-1)+j] = f(x[j], y[k])
+        for k in range(len(y)):
+            f_h[(k)*(N)+j] = f(x[j], y[k])
 
-    # g_h[1] = (1/h)**2*(g(x[1],0) + g(0,y[1]))
-    # g_h[N-2] = (1/h)**2*(g(x[N-2],0) + g(1,y[1]))
-    # g_h[(N-2)**2 - (N-3)] = (1/h)**2*(g(x[1],1) + g(0,y[N-1]))
-    # g_h[(N-2)**2] = (1/h)**2*(g(x[N-2],1) + g(1,y[N-2]))
-    # for j in range(2,N-2):#esto es para j in {2,...,N-2}
-    #     g_h[j] = (1/h)**2*g(x[j],0)
-    #     g_h[(N-2)*(N-3) + j] = (1/h)**2*g(x[j],1)
-    #     g_h[j*(N-2) + 1] = (1/h)**2*(g(0,y[j]))
-    #     g_h[j*(N-2)] = (1/h)**2*g(1,y[j])
+    g_h[1]=N**2*(g(x[1],0)+g(0,y[1]))
+    g_h[N-1]=N**2*(g(x[N-1],0)+g(1,y[1]))
+    g_h[(N-1)**2-(N-2)]=N**2*(g(x[1],1)+g(0,y[N-1]))
+    g_h[(N-1)**2]=N**2*(g(x[N-1],1)+g(1,y[N-1]))
+    for j in range(2,N-1):#esto es para j in {2,...,N-2}
+        g_h[j]=N**2*g(x[j],0)
+        g_h[(N-1)*(N-2)+j]=N**2*g(x[j],1)
+        g_h[j*(N-1)+1]=N**2*(g(0,y[j]))
+        g_h[j*(N-1)]=N**2*g(1,y[j])
 
     b_h = f_h + g_h
-    return b_h
+    return b_h[N+1:-N]
 
 ## Parte 2
 # Para N en {4,16}, grafique la solución numérica y la solución única de
@@ -110,20 +111,20 @@ for i in range(len(arreglo_N)):
     N = arreglo_N[i]
     h = 1 / N
 
-    u = sp.sparse.linalg.spsolve(calcula_A(N), calcula_b(N-1, f, g))
-    U = np.zeros((N, N))
+    u = sp.sparse.linalg.spsolve(calcula_A(N), calcula_b(N, f, g))
+    U = np.zeros((N+1, N+1))
     
-    for j in range(N-1):
-        for k in range(N-1):
-            U[k][j] = u[k + j*(N-1)]
-
-    x = np.linspace(0,1,N)
-    y = np.linspace(0,1,N)
-    u_analitico = lambda x,y: np.sin(2*np.pi*x)*(np.sin(2*np.pi*y) + (np.sinh(2*np.pi*y) / np.sinh(2*np.pi)))
-    U_analitico = np.zeros((N, N))
-
     for j in range(N):
-        for k in range(N):    
+        for k in range(N):
+            U[k][j] = u[k + j*(N)]
+
+    x = np.linspace(0,1,N+1)
+    y = np.linspace(0,1,N+1)
+    u_analitico = lambda x,y: np.sin(2*np.pi*x)*(np.sin(2*np.pi*y) + (np.sinh(2*np.pi*y) / np.sinh(2*np.pi)))
+    U_analitico = np.zeros((N+1, N+1))
+
+    for j in range(N+1):
+        for k in range(N+1):    
             U_analitico[j][k] = u_analitico(x[j], y[k])
     
     err = h * np.linalg.norm(U_analitico - U, 2)
