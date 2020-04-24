@@ -15,12 +15,9 @@ import scipy.sparse
 
 
 '''
-d_dt u - d2_dt2 u = 0 ;   (t,x) en (0,infinito)x(0,1)
-
+d_dt u - d2_dt2 u = 0 ;   (t,x) en (0,T)x(0,1)
 u(t,x+1) = u(t,x)     ;
-
-u(0,x)   = u_(x)         
-
+u(0,x)   = u_(x)      ;    x en (0,1)  
 
 N_T entero, un paso tempora dt > 0,
 N   entero, paso espacial   dx = 1/N                        
@@ -28,11 +25,10 @@ N   entero, paso espacial   dx = 1/N
 x_j = j dx, j en {0,...,N}
 t_n = n dt, n en {0,...,N_T}
 
-obs t_n = N_t*dt
-
+obs T = N_t*dt
 '''
 
-u_00 = lambda x: np.sin(4*np.pi*x)
+u_00 = lambda x: np.cos(0*x)
 
 def calcula_bloque_C(dt,N_T,N,u_0):
     dx = 1/N
